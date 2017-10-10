@@ -20,7 +20,8 @@ public class PlayerInformation : MonoBehaviour {
 
     public static PlayerInformation playerInformation;
     public int winnings = 0;
-    public bool isChangingLabel = false;
+    public bool isAddingWinnings = false;
+    public bool isSubtractingWinnings = false;
     public RectTransform goldPopupPrefab;
     public RectTransform goldPopupParent;
 
@@ -39,25 +40,44 @@ public class PlayerInformation : MonoBehaviour {
 	}
 
     void Update () { 
-        if(isChangingLabel && winnings > 0) {
+        if(isAddingWinnings && winnings > 0) {
             AddWinningsProgressively();
+        } else if(isSubtractingWinnings) {
+            SubtractBetProgressively();
         }
     }
 	
 	public void PlaceBet () {
-		m_gold -= m_bet;
-        print("Bet Placed (" + m_bet + ")");
-        UpdateLabels();
-        MakeGoldPopup(false, m_bet);
-        isChangingLabel = true;
+        if (!isAddingWinnings) {
+            print("Bet Placed (" + m_bet + ")");
+            m_tempGold = m_gold;
+            isSubtractingWinnings = true;
+            MakeGoldPopup(false, m_bet);            
+        }		
     }
 
-    //TODO: usar uma especie de queue ou simplesmente so deixar uma coisa de cada vez acontecer?
-	public void AddWinnings () {
-        if (!isChangingLabel) {
+    public void SubtractBetProgressively () {
+        //print("Subtracting | " + m_gold + " - " + m_bet);
+        int finalValue = m_gold - m_bet;
+        if (m_tempGold > finalValue) {
+            float valueToAdd = ((winnings * Time.deltaTime * winnings) + m_addingSpeed);
+            m_tempGold += valueToAdd < 1 ? 1 : (int)valueToAdd;
+            print(m_tempGold);
+            m_goldLabel.text = "Gold: " + m_tempGold;
+        } else {
+            //print("Adding stopped");
+            m_gold = finalValue;
+            winnings = 0;
+            isAddingWinnings = false;
+            UpdateLabels();
+        }
+    }
+
+    public void AddWinnings () {
+        if (!isAddingWinnings) {
             print("You won (" + winnings + ")");
             m_tempGold = m_gold;
-            isChangingLabel = true;
+            isAddingWinnings = true;
             MakeGoldPopup(true, winnings);
         }
 	}
@@ -74,7 +94,7 @@ public class PlayerInformation : MonoBehaviour {
             //print("Adding stopped");
             m_gold = finalValue;
             winnings = 0;
-            isChangingLabel = false;
+            isAddingWinnings = false;
             UpdateLabels();            
         }
     }
