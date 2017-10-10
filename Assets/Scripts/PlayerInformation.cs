@@ -20,14 +20,9 @@ public class PlayerInformation : MonoBehaviour {
 
     public static PlayerInformation playerInformation;
     public int winnings = 0;
-    public bool isAddingWinnings = false;
+    public bool isChangingLabel = false;
     public RectTransform goldPopupPrefab;
     public RectTransform goldPopupParent;
-
-
-
-
-    
 
     void Awake() {
         if (playerInformation == null)
@@ -44,7 +39,7 @@ public class PlayerInformation : MonoBehaviour {
 	}
 
     void Update () { 
-        if(isAddingWinnings && winnings > 0) {
+        if(isChangingLabel && winnings > 0) {
             AddWinningsProgressively();
         }
     }
@@ -54,14 +49,15 @@ public class PlayerInformation : MonoBehaviour {
         print("Bet Placed (" + m_bet + ")");
         UpdateLabels();
         MakeGoldPopup(false, m_bet);
+        isChangingLabel = true;
     }
 
     //TODO: usar uma especie de queue ou simplesmente so deixar uma coisa de cada vez acontecer?
 	public void AddWinnings () {
-        if (!isAddingWinnings) {
+        if (!isChangingLabel) {
             print("You won (" + winnings + ")");
             m_tempGold = m_gold;
-            isAddingWinnings = true;
+            isChangingLabel = true;
             MakeGoldPopup(true, winnings);
         }
 	}
@@ -78,7 +74,7 @@ public class PlayerInformation : MonoBehaviour {
             //print("Adding stopped");
             m_gold = finalValue;
             winnings = 0;
-            isAddingWinnings = false;
+            isChangingLabel = false;
             UpdateLabels();            
         }
     }
@@ -90,9 +86,11 @@ public class PlayerInformation : MonoBehaviour {
     }
 
     private void MakeGoldPopup(bool isAdding, int value) {
-        Transform goldPopup = Instantiate(goldPopupPrefab, goldPopupPrefab.position, goldPopupPrefab.rotation, goldPopupParent) as RectTransform;
-        Text gold = goldPopup.GetChild(0).GetComponent<Text>();
+        Transform goldPopup = Instantiate(goldPopupPrefab, goldPopupPrefab.position, goldPopupPrefab.rotation, goldPopupParent) as RectTransform;        
+        Text gold = goldPopup.GetComponent<Text>();
         gold.text = isAdding ? "+" + value : "-" + value;
         gold.color = isAdding ? Color.yellow : Color.red;
+        goldPopup.localPosition = Vector3.zero;
+        Destroy(goldPopup.gameObject, 1.5f);
     }
 }
