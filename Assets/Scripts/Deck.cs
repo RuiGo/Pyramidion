@@ -15,7 +15,7 @@ namespace FortuneTower {
         void AddStandardCards() {
             int cardNumber = 0;
             //Only cards from 1 to 7
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < m_differentCards; i++) {
                 cardNumber++;
                 for (int j = 0; j < m_numberOfEqualCards; j++) {
                     Card c = new Card(cardNumber);

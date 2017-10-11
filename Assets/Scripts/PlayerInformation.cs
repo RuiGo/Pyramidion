@@ -60,15 +60,14 @@ public class PlayerInformation : MonoBehaviour {
         //print("Subtracting | " + m_gold + " - " + m_bet);
         int finalValue = m_gold - m_bet;
         if (m_tempGold > finalValue) {
-            float valueToAdd = ((winnings * Time.deltaTime * winnings) + m_addingSpeed);
-            m_tempGold += valueToAdd < 1 ? 1 : (int)valueToAdd;
+            float valueToSubtract = ((m_bet * Time.deltaTime) + m_addingSpeed);
+            m_tempGold -= valueToSubtract < 1 ? 1 : (int)valueToSubtract;
             print(m_tempGold);
             m_goldLabel.text = "Gold: " + m_tempGold;
         } else {
-            //print("Adding stopped");
+            //print("Subtracting stopped");
             m_gold = finalValue;
-            winnings = 0;
-            isAddingWinnings = false;
+            isSubtractingWinnings = false;
             UpdateLabels();
         }
     }

@@ -184,8 +184,7 @@ public class Dealer : MonoBehaviour {
                     upperRow[i].crdScript.ExplodeCard();
 
                 if (!lowerRow[i].hasExploded) {
-                    lowerRow[i].crdScript.ExplodeCard();
-                    /*
+                    lowerRow[i].crdScript.ExplodeCard();                   
                     if (!m_gateCardUsed) {
                         m_gateCardUsed = true;
                         m_isJackpot = false;
@@ -194,8 +193,7 @@ public class Dealer : MonoBehaviour {
                             upperRow[i].crdScript.CleanCard();
                         }
                     }
-                    */
-}
+                }
             }
             //Check card right to upper one
             if (upperRow[i].cardNumber == lowerRow[i + 1].cardNumber) {
@@ -207,8 +205,8 @@ public class Dealer : MonoBehaviour {
                     if (!m_gateCardUsed) {
                         m_gateCardUsed = true;
                         m_isJackpot = false;
-                        bool flag = UseGateCard(upperRow[i], lowerRow[i], i);
-                        if (flag) {
+                        bool isDifferentNumberCard = UseGateCard(upperRow[i], lowerRow[i + 1], i + 1);
+                        if (isDifferentNumberCard) {
                             upperRow[i].crdScript.CleanCard();
                         }
                     }
