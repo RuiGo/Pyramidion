@@ -151,6 +151,7 @@ public class Dealer : MonoBehaviour {
                             InputHandler.inputHandlerScript.ToggleButton("newRound", true);
                             InputHandler.inputHandlerScript.ToggleButton("mainMenu", true);
                         } else {
+                            print("SHOW");
                             InputHandler.inputHandlerScript.ToggleButton("bank", true);
                             InputHandler.inputHandlerScript.ToggleButton("deal", true);
                         }
@@ -215,6 +216,7 @@ public class Dealer : MonoBehaviour {
         }
         if (CheckForExplodedCardsInRow(m_rows[m_rowInPlay - 1])) {
             gameEnded = true;
+            print("HIDE");
             InputHandler.inputHandlerScript.ToggleButton("bank", false);
             InputHandler.inputHandlerScript.ToggleButton("deal", false);
 
@@ -287,10 +289,11 @@ public class Dealer : MonoBehaviour {
 
         //TODO: change to use compare rows again
         //check if the cards still explode
-        if (m_rows[0][0].cardNumber == upperCard.cardNumber)
+        if (m_rows[0][0].cardNumber == upperCard.cardNumber) {
             return false;
-        else
+        } else {
             return true;
+        }            
     }
 
     private void PrintCardList(List<Card> list) {

@@ -62,7 +62,7 @@ public class PlayerInformation : MonoBehaviour {
         if (m_tempGold > finalValue) {
             float valueToSubtract = ((m_bet * Time.deltaTime) + m_addingSpeed);
             m_tempGold -= valueToSubtract < 1 ? 1 : (int)valueToSubtract;
-            print(m_tempGold);
+            //print(m_tempGold);
             m_goldLabel.text = "Gold: " + m_tempGold;
         } else {
             //print("Subtracting stopped");
@@ -87,7 +87,7 @@ public class PlayerInformation : MonoBehaviour {
         if (m_tempGold < finalValue) {
             float valueToAdd = ((winnings * Time.deltaTime * winnings) + m_addingSpeed);
             m_tempGold += valueToAdd < 1 ? 1 : (int)valueToAdd;
-            print(m_tempGold);
+            //print(m_tempGold);
             m_goldLabel.text = "Gold: " + m_tempGold;
         } else {
             //print("Adding stopped");
