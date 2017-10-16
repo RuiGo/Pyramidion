@@ -150,8 +150,13 @@ public class Dealer : MonoBehaviour {
 
                             InputHandler.inputHandlerScript.ToggleButton("newRound", true);
                             InputHandler.inputHandlerScript.ToggleButton("mainMenu", true);
+                        } else if(gameEnded) {
+                            InputHandler.inputHandlerScript.ToggleButton("bank", false);
+                            InputHandler.inputHandlerScript.ToggleButton("deal", false);
+
+                            InputHandler.inputHandlerScript.ToggleButton("newRound", true);
+                            InputHandler.inputHandlerScript.ToggleButton("mainMenu", true);
                         } else {
-                            print("SHOW");
                             InputHandler.inputHandlerScript.ToggleButton("bank", true);
                             InputHandler.inputHandlerScript.ToggleButton("deal", true);
                         }
@@ -216,12 +221,6 @@ public class Dealer : MonoBehaviour {
         }
         if (CheckForExplodedCardsInRow(m_rows[m_rowInPlay - 1])) {
             gameEnded = true;
-            print("HIDE");
-            InputHandler.inputHandlerScript.ToggleButton("bank", false);
-            InputHandler.inputHandlerScript.ToggleButton("deal", false);
-
-            InputHandler.inputHandlerScript.ToggleButton("newRound", true);
-            InputHandler.inputHandlerScript.ToggleButton("mainMenu", true);
         }
     }
 
