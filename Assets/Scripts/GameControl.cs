@@ -7,9 +7,8 @@ using System.IO;
 
 public class GameControl : MonoBehaviour {
     public static GameControl gameControl;
-    private string saveFilePath = Application.persistentDataPath + "/playerInfo.dat";
+    string saveFilePath;
     public int gold;
-    public int level;
 
     private void Awake () {
         if(gameControl == null) {
@@ -18,6 +17,8 @@ public class GameControl : MonoBehaviour {
         } else if(gameControl != this) {
             Destroy(gameObject);
         }
+
+        saveFilePath = Application.persistentDataPath + "/playerInfo.dat";
     }
 
     private void Update () {
@@ -31,30 +32,34 @@ public class GameControl : MonoBehaviour {
 
 
     public void SaveData() {
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(saveFilePath); // se não houver ficheiro
         print(saveFilePath);
+        BinaryFormatter binFormatter = new BinaryFormatter();
+        FileStream file;
+        if (!File.Exists(saveFilePath)) {
+            file = File.Create(saveFilePath);
+        } else {
+            file = File.Open(saveFilePath, FileMode.Open);
+        }        
         PlayerData data = new PlayerData();
-        data.gold = gold;
-        data.level = level;
-        bf.Serialize(file, data);
+        data.currentGold = gold;
+        binFormatter.Serialize(file, data);
         file.Close();
     }
 
     public void LoadData() {
         if (File.Exists(saveFilePath)) {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/playerInfo.dat", FileMode.Open);
-            PlayerData data = (PlayerData)bf.Deserialize(file);
+            BinaryFormatter binFormatter = new BinaryFormatter();
+            FileStream file = File.Open(saveFilePath, FileMode.Open);
+            PlayerData loadedData = (PlayerData)binFormatter.Deserialize(file);
             file.Close();
-            print("Gold -> " + data.gold);
-            print("Level -> " + data.level);
+            print("Gold -> " + loadedData.currentGold);
+        } else {
+            print("No save file exists.");
         }
     }
 }
 
 [Serializable]
 class PlayerData {
-    public int gold;
-    public int level;
+    public int currentGold;
 }
