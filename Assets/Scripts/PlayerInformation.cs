@@ -4,26 +4,26 @@ using UnityEngine.UI;
 
 public class PlayerInformation : MonoBehaviour {
 
-    [SerializeField]	
-    private Text m_goldLabel;
-    [SerializeField]
-    private Text m_betLabel;
-    [SerializeField]
-    private Text m_winLabel;
-    [SerializeField]
-    private int m_gold = 1000;
-    [SerializeField]
-    private int m_bet = 15;
-    [SerializeField]
-    private float m_addingSpeed = 0.001f;    
-    private int m_tempGold;
-
     public static PlayerInformation playerInformation;
     public int winnings = 0;
     public bool isAddingWinnings = false;
     public bool isSubtractingWinnings = false;
     public RectTransform goldPopupPrefab;
     public RectTransform goldPopupParent;
+
+    [SerializeField]	
+    private Text goldLabel;
+    [SerializeField]
+    private Text betLabel;
+    [SerializeField]
+    private Text winLabel;
+    [SerializeField]
+    private int gold = 1000;
+    [SerializeField]
+    private int bet = 15;
+    [SerializeField]
+    private float addingSpeed = 0.001f;    
+    private int tempGold;    
 
     void Awake() {
         if (playerInformation == null)
@@ -49,24 +49,24 @@ public class PlayerInformation : MonoBehaviour {
 	
 	public void PlaceBet () {
         if (!isAddingWinnings) {
-            print("Bet Placed (" + m_bet + ")");
-            m_tempGold = m_gold;
+            print("Bet Placed (" + bet + ")");
+            tempGold = gold;
             isSubtractingWinnings = true;
-            MakeGoldPopup(false, m_bet);            
+            MakeGoldPopup(false, bet);            
         }		
     }
 
     public void SubtractBetProgressively () {
-        //print("Subtracting | " + m_gold + " - " + m_bet);
-        int finalValue = m_gold - m_bet;
-        if (m_tempGold > finalValue) {
-            float valueToSubtract = ((m_bet * Time.deltaTime) + m_addingSpeed);
-            m_tempGold -= valueToSubtract < 1 ? 1 : (int)valueToSubtract;
-            //print(m_tempGold);
-            m_goldLabel.text = "Gold: " + m_tempGold;
+        //print("Subtracting | " + gold + " - " + bet);
+        int finalValue = gold - bet;
+        if (tempGold > finalValue) {
+            float valueToSubtract = ((bet * Time.deltaTime) + addingSpeed);
+            tempGold -= valueToSubtract < 1 ? 1 : (int)valueToSubtract;
+            //print(tempGold);
+            goldLabel.text = "Gold: " + tempGold;
         } else {
             //print("Subtracting stopped");
-            m_gold = finalValue;
+            gold = finalValue;
             isSubtractingWinnings = false;
             UpdateLabels();
         }
@@ -75,23 +75,23 @@ public class PlayerInformation : MonoBehaviour {
     public void AddWinnings () {
         if (!isAddingWinnings) {
             print("You won (" + winnings + ")");
-            m_tempGold = m_gold;
+            tempGold = gold;
             isAddingWinnings = true;
             MakeGoldPopup(true, winnings);
         }
 	}
 
     public void AddWinningsProgressively () {
-        //print("Adding | " + m_gold + " + " + winnings);
-        int finalValue = m_gold + winnings;
-        if (m_tempGold < finalValue) {
-            float valueToAdd = ((winnings * Time.deltaTime * winnings) + m_addingSpeed);
-            m_tempGold += valueToAdd < 1 ? 1 : (int)valueToAdd;
-            //print(m_tempGold);
-            m_goldLabel.text = "Gold: " + m_tempGold;
+        //print("Adding | " + gold + " + " + winnings);
+        int finalValue = gold + winnings;
+        if (tempGold < finalValue) {
+            float valueToAdd = ((winnings * Time.deltaTime * winnings) + addingSpeed);
+            tempGold += valueToAdd < 1 ? 1 : (int)valueToAdd;
+            //print(tempGold);
+            goldLabel.text = "Gold: " + tempGold;
         } else {
             //print("Adding stopped");
-            m_gold = finalValue;
+            gold = finalValue;
             winnings = 0;
             isAddingWinnings = false;
             UpdateLabels();            
@@ -99,9 +99,9 @@ public class PlayerInformation : MonoBehaviour {
     }
 
     public void UpdateLabels() {
-        m_goldLabel.text = "Gold: " + m_gold;
-        m_betLabel.text = "Bet: " + m_bet;
-        m_winLabel.text = "Win: " + winnings;
+        goldLabel.text = "Gold: " + gold;
+        betLabel.text = "Bet: " + bet;
+        winLabel.text = "Win: " + winnings;
     }
 
     private void MakeGoldPopup(bool isAdding, int value) {

@@ -5,8 +5,9 @@ using System.Collections.Generic;
 namespace FortuneTower {
     public class Deck {
         public List<Card> deckCardsList = new List<Card>();
-        private int m_differentCards = 10; //Number of different cards ex: 1-7
-        private int m_numberOfEqualCards = 10; //Number of duplicates of each card
+
+        private int differentCards = 10; //Number of different cards ex: 1-7
+        private int numberOfEqualCards = 10; //Number of duplicates of each card
 
         public Deck() {
             AddStandardCards();
@@ -15,9 +16,9 @@ namespace FortuneTower {
         void AddStandardCards() {
             int cardNumber = 0;
             //Only cards from 1 to 7
-            for (int i = 0; i < m_differentCards; i++) {
+            for (int i = 0; i < differentCards; i++) {
                 cardNumber++;
-                for (int j = 0; j < m_numberOfEqualCards; j++) {
+                for (int j = 0; j < numberOfEqualCards; j++) {
                     Card c = new Card(cardNumber);
                     deckCardsList.Add(c);
                 }

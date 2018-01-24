@@ -16,19 +16,19 @@ public class Dealer : MonoBehaviour {
     public static CardDealerEventHandler cardDealerDelegate;
     public static bool gameEnded;
 
-    private Deck m_currentDeck = new Deck();
-    private List<List<Card>> m_rows = new List<List<Card>>();
+    private Deck currentDeck = new Deck();
+    private List<List<Card>> rows = new List<List<Card>>();
     [SerializeField]
-    private List<GameObject> m_spawnedCards = new List<GameObject>();
-    private int m_maxRows = 5;
-    private int m_rowInPlay = 1;
-    private bool m_isJackpot = true;
-    private int m_jackpotValue = 0;
-    private bool m_gateCardUsed = false;
-    private float m_dealCardTimer = 0;
-    private float m_dealCardTimerCooldown = 0.75f;
-    private int m_dealRowCardIndex = 0;
-    private Card m_firstCardExploded;
+    private List<GameObject> spawnedCards = new List<GameObject>();
+    private int maxRows = 5;
+    private int rowInPlay = 1;
+    private bool isJackpot = true;
+    private int jackpotValue = 0;
+    private bool gateCardUsed = false;
+    private float dealCardTimer = 0;
+    private float dealCardTimerCooldown = 0.75f;
+    private int dealRowCardIndex = 0;
+    private Card firstCardExploded;
     
     void Awake() {
         if (dealerScript == null) {
@@ -42,11 +42,11 @@ public class Dealer : MonoBehaviour {
 	void Start () {
         InputHandler.inputHandlerScript.HideAllButtons();
         gameEnded = false;
-        m_currentDeck.ShuffleDeck();
+        currentDeck.ShuffleDeck();
         ChooseRows();
         SetPositions();
-        m_jackpotValue = CalculateJackpotValue();
-        print("Jackpot Value: " + m_jackpotValue);
+        jackpotValue = CalculateJackpotValue();
+        print("Jackpot Value: " + jackpotValue);
         PlayerInformation.playerInformation.PlaceBet();
         cardDealerDelegate = DealRowTimed;
     }
@@ -60,19 +60,19 @@ public class Dealer : MonoBehaviour {
     //Fills the rows with cards from the deck
     private void ChooseRows() {
         int rowNumber = 0;
-        for (int i = 0; i < m_maxRows; i++) {
+        for (int i = 0; i < maxRows; i++) {
             rowNumber++;
             List<Card> rowCards = new List<Card>();
             for (int j = 0; j < rowNumber; j++) {
-                rowCards.Add(m_currentDeck.deckCardsList[0]);
-                m_currentDeck.deckCardsList.Remove(m_currentDeck.deckCardsList[0]);
+                rowCards.Add(currentDeck.deckCardsList[0]);
+                currentDeck.deckCardsList.Remove(currentDeck.deckCardsList[0]);
             }
-            m_rows.Add(rowCards);
+            rows.Add(rowCards);
         }
-        for (int x = 0; x < m_rows.Count; x++) {
+        for (int x = 0; x < rows.Count; x++) {
             string str = "|";
-            for (int y = 0; y < m_rows[x].Count; y++) {
-                str += m_rows[x][y].cardNumber + "|";
+            for (int y = 0; y < rows[x].Count; y++) {
+                str += rows[x][y].cardNumber + "|";
             }
             //print(str);
         }
@@ -81,7 +81,7 @@ public class Dealer : MonoBehaviour {
     //Registers the cards' final positions in the rows
     private void SetPositions() {
         int rowNumber = 0;
-        for (int i = 0; i < m_maxRows; i++) {
+        for (int i = 0; i < maxRows; i++) {
             rowNumber++;
             List<Transform> rowPositions = new List<Transform>();
             for (int j = 0; j < rowNumber; j++) {
@@ -92,54 +92,54 @@ public class Dealer : MonoBehaviour {
     }
 
     private void DealRowTimed() {
-        if (m_dealCardTimer <= 0) {
-            m_dealCardTimer = 0;
+        if (dealCardTimer <= 0) {
+            dealCardTimer = 0;
             // Check if row is within set limit of rounds
-            if (m_rowInPlay >= 0 && m_rowInPlay <= m_maxRows) {
-                if (m_dealRowCardIndex >= 0 && m_dealRowCardIndex < m_rows[m_rowInPlay - 1].Count) {
+            if (rowInPlay >= 0 && rowInPlay <= maxRows) {
+                if (dealRowCardIndex >= 0 && dealRowCardIndex < rows[rowInPlay - 1].Count) {
                     // Create card object
                     Transform c = Instantiate(cardPrefab, cardSpawnPosition.position, cardPrefab.rotation) as Transform;
                     CardScript script = c.GetComponent<CardScript>();
-                    script.intendedPosition = availablePositionsList[m_rowInPlay - 1][m_dealRowCardIndex];
-                    script.cardObj = m_rows[m_rowInPlay - 1][m_dealRowCardIndex];
+                    script.intendedPosition = availablePositionsList[rowInPlay - 1][dealRowCardIndex];
+                    script.cardObj = rows[rowInPlay - 1][dealRowCardIndex];
                     script.cardObj.crdScript = script;
-                    m_spawnedCards.Add(c.gameObject);
-                    if (m_rowInPlay == 1) {
+                    spawnedCards.Add(c.gameObject);
+                    if (rowInPlay == 1) {
                         script.cardObj.isTurned = false;
                     } else {
                         script.cardObj.isTurned = true;
                         c.GetComponent<Animator>().SetTrigger("faceUp");
                     }
-                    SortChildren(c, m_rowInPlay - 1);
+                    SortChildren(c, rowInPlay - 1);
 
-                    m_dealRowCardIndex++;
-                    m_dealCardTimer = m_dealCardTimerCooldown;
+                    dealRowCardIndex++;
+                    dealCardTimer = dealCardTimerCooldown;
                     // check if reached the end of the deal index
-                    if (m_dealRowCardIndex >= m_rows[m_rowInPlay - 1].Count) {
-                        m_dealRowCardIndex = 0;
-                        if (m_rowInPlay > 1) {
+                    if (dealRowCardIndex >= rows[rowInPlay - 1].Count) {
+                        dealRowCardIndex = 0;
+                        if (rowInPlay > 1) {
                             cardDealerDelegate = null;
-                            m_dealCardTimer = 0;
-                            if (m_rowInPlay == 2) {
-                                numberLabelsCanvas.GetChild(m_rowInPlay - 2).gameObject.SetActive(true);
-                                numberLabelsCanvas.GetChild(m_rowInPlay - 2).GetComponent<Text>().text = CalculateRowValue(m_rowInPlay - 1).ToString();
-                                PlayerInformation.playerInformation.winnings = CalculateRowValue(m_rowInPlay - 1);
+                            dealCardTimer = 0;
+                            if (rowInPlay == 2) {
+                                numberLabelsCanvas.GetChild(rowInPlay - 2).gameObject.SetActive(true);
+                                numberLabelsCanvas.GetChild(rowInPlay - 2).GetComponent<Text>().text = CalculateRowValue(rowInPlay - 1).ToString();
+                                PlayerInformation.playerInformation.winnings = CalculateRowValue(rowInPlay - 1);
                                 PlayerInformation.playerInformation.UpdateLabels();
                                 //print("Row value: " + CalculateRowValue(rowInPlay - 1));
                             } else {
                                 // Compare against upper row
                                 CompareRows();
-                                numberLabelsCanvas.GetChild(m_rowInPlay - 2).gameObject.SetActive(true);
-                                numberLabelsCanvas.GetChild(m_rowInPlay - 2).GetComponent<Text>().text = CalculateRowValue(m_rowInPlay - 1).ToString();
-                                PlayerInformation.playerInformation.winnings = CalculateRowValue(m_rowInPlay - 1);
+                                numberLabelsCanvas.GetChild(rowInPlay - 2).gameObject.SetActive(true);
+                                numberLabelsCanvas.GetChild(rowInPlay - 2).GetComponent<Text>().text = CalculateRowValue(rowInPlay - 1).ToString();
+                                PlayerInformation.playerInformation.winnings = CalculateRowValue(rowInPlay - 1);
                                 //print("Row value: " + CalculateRowValue(rowInPlay - 1));                                
                             }
                         }
-                        m_rowInPlay++;
+                        rowInPlay++;
                         // If reached last row
-                        if (m_rowInPlay > m_maxRows && !gameEnded) {
-                            if (m_isJackpot) {
-                                PlayerInformation.playerInformation.winnings = m_jackpotValue;
+                        if (rowInPlay > maxRows && !gameEnded) {
+                            if (isJackpot) {
+                                PlayerInformation.playerInformation.winnings = jackpotValue;
                                 PlayerInformation.playerInformation.UpdateLabels();
                                 //start jackpot effects                                
                             }
@@ -168,7 +168,7 @@ public class Dealer : MonoBehaviour {
                 print("Rows beyond set limit!");
             }
         } else {
-            m_dealCardTimer -= Time.deltaTime;
+            dealCardTimer -= Time.deltaTime;
         }
     }
 
@@ -180,8 +180,8 @@ public class Dealer : MonoBehaviour {
 
     //Compares upper row cards with lower row
     private void CompareRows() {        
-        List<Card> upperRow = m_rows[m_rowInPlay - 2];
-        List<Card> lowerRow = m_rows[m_rowInPlay - 1];
+        List<Card> upperRow = rows[rowInPlay - 2];
+        List<Card> lowerRow = rows[rowInPlay - 1];
 
         for (int i = 0; i < upperRow.Count; i++) {
             //Check card left to upper one
@@ -191,9 +191,9 @@ public class Dealer : MonoBehaviour {
 
                 if (!lowerRow[i].hasExploded) {
                     lowerRow[i].crdScript.ExplodeCard();                   
-                    if (!m_gateCardUsed) {
-                        m_gateCardUsed = true;
-                        m_isJackpot = false;
+                    if (!gateCardUsed) {
+                        gateCardUsed = true;
+                        isJackpot = false;
                         bool flag = UseGateCard(upperRow[i], lowerRow[i], i);
                         if (flag) {
                             upperRow[i].crdScript.CleanCard();
@@ -208,9 +208,9 @@ public class Dealer : MonoBehaviour {
 
                 if (!lowerRow[i + 1].hasExploded) {
                     lowerRow[i + 1].crdScript.ExplodeCard();
-                    if (!m_gateCardUsed) {
-                        m_gateCardUsed = true;
-                        m_isJackpot = false;
+                    if (!gateCardUsed) {
+                        gateCardUsed = true;
+                        isJackpot = false;
                         bool isDifferentNumberCard = UseGateCard(upperRow[i], lowerRow[i + 1], i + 1);
                         if (isDifferentNumberCard) {
                             upperRow[i].crdScript.CleanCard();
@@ -219,7 +219,7 @@ public class Dealer : MonoBehaviour {
                 }
             }
         }
-        if (CheckForExplodedCardsInRow(m_rows[m_rowInPlay - 1])) {
+        if (CheckForExplodedCardsInRow(rows[rowInPlay - 1])) {
             gameEnded = true;
         }
     }
@@ -234,7 +234,7 @@ public class Dealer : MonoBehaviour {
 
     private int CalculateRowValue(int rowNumber) {
         bool anyExploded = false;
-        foreach (Card c in m_rows[rowNumber]) {
+        foreach (Card c in rows[rowNumber]) {
             if (c.hasExploded) {
                 anyExploded = true;
                 break;
@@ -245,14 +245,14 @@ public class Dealer : MonoBehaviour {
         } else {
             int value = 0; // for now it's the number, later it will be the value
             int count = 0; // number of equal cards
-            int multiplierNumber = m_rows[rowNumber][0].cardNumber;
-            foreach (Card c in m_rows[rowNumber]) {
+            int multiplierNumber = rows[rowNumber][0].cardNumber;
+            foreach (Card c in rows[rowNumber]) {
                 value += c.cardNumber;
                 if (c.cardNumber == multiplierNumber)
                     count++;
             }
             //if number of equal card is the same as the cards in the row
-            if (count > 0 && count == m_rows[rowNumber].Count) {
+            if (count > 0 && count == rows[rowNumber].Count) {
                 return value * count;
                 //anounce multiplier -> animations etc etc
             } else
@@ -262,7 +262,7 @@ public class Dealer : MonoBehaviour {
 
     private int CalculateJackpotValue () {
         int value = 0;
-        foreach (List<Card> list in m_rows) {
+        foreach (List<Card> list in rows) {
             foreach (Card c in list) {
                 value += c.cardNumber;
             }
@@ -272,7 +272,7 @@ public class Dealer : MonoBehaviour {
 
     private bool UseGateCard(Card upperCard, Card bottomCard, int bottomCardIndex) {
         //replace the old card for the new one in the list
-        m_rows[m_rowInPlay - 1][bottomCardIndex] = m_rows[0][0];
+        rows[rowInPlay - 1][bottomCardIndex] = rows[0][0];
 
         //pull the old card a little bit back
         Vector3 newPosition = bottomCard.crdScript.transform.position;
@@ -280,15 +280,15 @@ public class Dealer : MonoBehaviour {
         bottomCard.crdScript.transform.position = newPosition;
 
         //set the old card's position and sorting order for the new one
-        m_rows[0][0].crdScript.intendedPosition = availablePositionsList[m_rowInPlay - 1][bottomCardIndex];
-        m_rows[0][0].crdScript.finalPositionDirection = m_rows[0][0].crdScript.intendedPosition.position - m_rows[0][0].crdScript.transform.position;
-        m_rows[0][0].crdScript.isInPosition = false;
-        SortChildren(m_rows[0][0].crdScript.transform, bottomCard.crdScript.transform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder);
-        m_rows[0][0].crdScript.FlipCard();
+        rows[0][0].crdScript.intendedPosition = availablePositionsList[rowInPlay - 1][bottomCardIndex];
+        rows[0][0].crdScript.finalPositionDirection = rows[0][0].crdScript.intendedPosition.position - rows[0][0].crdScript.transform.position;
+        rows[0][0].crdScript.isInPosition = false;
+        SortChildren(rows[0][0].crdScript.transform, bottomCard.crdScript.transform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder);
+        rows[0][0].crdScript.FlipCard();
 
         //TODO: change to use compare rows again
         //check if the cards still explode
-        if (m_rows[0][0].cardNumber == upperCard.cardNumber) {
+        if (rows[0][0].cardNumber == upperCard.cardNumber) {
             return false;
         } else {
             return true;
@@ -306,7 +306,7 @@ public class Dealer : MonoBehaviour {
         for (int j = 0; j < 7; j++) {
             string str = "|";
             for (int i = 0; i < 10; i++) {
-                str += m_currentDeck.deckCardsList[count].cardNumber.ToString() + "|";
+                str += currentDeck.deckCardsList[count].cardNumber.ToString() + "|";
                 count++;
             }
             print(str);
@@ -314,17 +314,17 @@ public class Dealer : MonoBehaviour {
     }
 
     private void ClearSpawnedCards() {
-        foreach (GameObject obj in m_spawnedCards) {
+        foreach (GameObject obj in spawnedCards) {
             Destroy(obj);
         }
-        m_spawnedCards.Clear();
+        spawnedCards.Clear();
         for (int i=0; i<numberLabelsCanvas.childCount; i++) {
             numberLabelsCanvas.GetChild(i).gameObject.SetActive(false);
         }
     }
 
     public void DealNextRow() {
-        if (cardDealerDelegate == null && (m_rowInPlay >= 0 && m_rowInPlay <= m_maxRows) && !gameEnded) {
+        if (cardDealerDelegate == null && (rowInPlay >= 0 && rowInPlay <= maxRows) && !gameEnded) {
             InputHandler.inputHandlerScript.ToggleButton("bank", false);
             InputHandler.inputHandlerScript.ToggleButton("deal", false);
             cardDealerDelegate = DealRowTimed;
@@ -332,7 +332,7 @@ public class Dealer : MonoBehaviour {
     }
 
     public void BankMoney() {
-        if (cardDealerDelegate == null && (m_rowInPlay >= 0 && m_rowInPlay <= m_maxRows) && !gameEnded) {
+        if (cardDealerDelegate == null && (rowInPlay >= 0 && rowInPlay <= maxRows) && !gameEnded) {
             // Hide Buttons
             InputHandler.inputHandlerScript.ToggleButton("bank", false);
             InputHandler.inputHandlerScript.ToggleButton("deal", false);
@@ -351,21 +351,21 @@ public class Dealer : MonoBehaviour {
         InputHandler.inputHandlerScript.HideAllButtons();
 
         ClearSpawnedCards();
-        m_isJackpot = true;
-        m_jackpotValue = 0;
-        m_gateCardUsed = false;
-        m_dealCardTimer = 0;
-        m_dealRowCardIndex = 0;
+        isJackpot = true;
+        jackpotValue = 0;
+        gateCardUsed = false;
+        dealCardTimer = 0;
+        dealRowCardIndex = 0;
         gameEnded = false;
-        m_rows.Clear();
-        m_currentDeck = new Deck();
-        m_currentDeck.ShuffleDeck();
+        rows.Clear();
+        currentDeck = new Deck();
+        currentDeck.ShuffleDeck();
         ChooseRows();
         SetPositions();
-        m_jackpotValue = CalculateJackpotValue();
-        print("Jackpot Value: " + m_jackpotValue);
+        jackpotValue = CalculateJackpotValue();
+        print("Jackpot Value: " + jackpotValue);
         PlayerInformation.playerInformation.PlaceBet();
-        m_rowInPlay = 1;
+        rowInPlay = 1;
         cardDealerDelegate = DealRowTimed;
     }
 }

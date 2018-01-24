@@ -7,13 +7,13 @@ public class InputHandler : MonoBehaviour {
 
     public static InputHandler inputHandlerScript;
     [SerializeField]
-    private Button m_dealButton;
+    private Button dealButton;
     [SerializeField]
-    private Button m_bankButton;
+    private Button bankButton;
     [SerializeField]
-    private Button m_newRoundButton;
+    private Button newRoundButton;
     [SerializeField]
-    private Button m_mainMenuButton;
+    private Button mainMenuButton;
 
 
     void Awake() {
@@ -51,25 +51,25 @@ public class InputHandler : MonoBehaviour {
     }
 
     public void HideAllButtons() {
-        m_dealButton.gameObject.SetActive(false);
-        m_bankButton.gameObject.SetActive(false);
-        m_newRoundButton.gameObject.SetActive(false);
-        m_mainMenuButton.gameObject.SetActive(false);
+        dealButton.gameObject.SetActive(false);
+        bankButton.gameObject.SetActive(false);
+        newRoundButton.gameObject.SetActive(false);
+        mainMenuButton.gameObject.SetActive(false);
     }
 
     public void ToggleButton(string btn, bool visible) {
         switch(btn) {
             case "deal":
-                m_dealButton.gameObject.SetActive(visible);
+                dealButton.gameObject.SetActive(visible);
                 break;
             case "bank":
-                m_bankButton.gameObject.SetActive(visible);
+                bankButton.gameObject.SetActive(visible);
                 break;
             case "newRound":
-                m_newRoundButton.gameObject.SetActive(visible);
+                newRoundButton.gameObject.SetActive(visible);
                 break;
             case "mainMenu":
-                m_mainMenuButton.gameObject.SetActive(visible);
+                mainMenuButton.gameObject.SetActive(visible);
                 break;
             default:
                 print("Not a valid button");

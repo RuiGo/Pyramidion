@@ -6,9 +6,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
 public class GameControl : MonoBehaviour {
-    public static GameControl gameControl;
-    string saveFilePath;
+    public static GameControl gameControl;    
     public int gold;
+
+    private string saveFilePath;
 
     private void Awake () {
         if(gameControl == null) {

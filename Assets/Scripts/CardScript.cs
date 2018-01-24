@@ -3,9 +3,9 @@ using FortuneTower;
 
 public class CardScript : MonoBehaviour {
     
-    private Animator m_cardAnimator;
-    private float m_movementSpeed = 20f;
-    private float m_snapPositionDistance = 0.2f;
+    private Animator cardAnimator;
+    private float movementSpeed = 20f;
+    private float snapPositionDistance = 0.2f;
 
     public Vector3 finalPositionDirection;
     public Card cardObj;
@@ -15,7 +15,7 @@ public class CardScript : MonoBehaviour {
     
 
     void Start () {
-        m_cardAnimator = GetComponent<Animator>();
+        cardAnimator = GetComponent<Animator>();
         isInPosition = false;
         //print("card position: " + intendedPosition.gameObject.name);
         finalPositionDirection = intendedPosition.position - transform.position;
@@ -55,19 +55,19 @@ public class CardScript : MonoBehaviour {
     public void FlipCard() {
         if (cardObj.isTurned) {
             cardObj.isTurned = false;
-            m_cardAnimator.SetTrigger("faceDown");
+            cardAnimator.SetTrigger("faceDown");
         } else {
             cardObj.isTurned = true;
-            m_cardAnimator.SetTrigger("faceUp");
+            cardAnimator.SetTrigger("faceUp");
         }
     }
 
     public void GoToIntendedPosition() {
         float distanceToPosition = Vector3.Distance(transform.position, intendedPosition.position);
-        if (distanceToPosition > m_snapPositionDistance) {
+        if (distanceToPosition > snapPositionDistance) {
             Vector3 finalPosDir = intendedPosition.position - transform.position;
             Vector3 newPosition = transform.position;
-            newPosition += finalPosDir.normalized * m_movementSpeed * Time.deltaTime;
+            newPosition += finalPosDir.normalized * movementSpeed * Time.deltaTime;
             transform.position = newPosition;
         } else {
             transform.position = intendedPosition.position;

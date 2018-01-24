@@ -4,7 +4,6 @@ using System.Collections;
 public class SpriteStorage : MonoBehaviour {
 
     public static SpriteStorage spriteStorage;
-
     public Sprite[] cardFaces = new Sprite[11];
 
     void Awake() {
