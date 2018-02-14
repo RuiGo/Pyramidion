@@ -52,7 +52,8 @@ public class PlayerInformation : MonoBehaviour {
             print("Bet Placed (" + bet + ")");
             tempGold = gold;
             isSubtractingWinnings = true;
-            MakeGoldPopup(false, bet);            
+            MakeGoldPopup(false, bet);
+            SoundManager.soundManagerScript.PlaySound("coinBet");
         }		
     }
 
@@ -78,6 +79,7 @@ public class PlayerInformation : MonoBehaviour {
             tempGold = gold;
             isAddingWinnings = true;
             MakeGoldPopup(true, winnings);
+            SoundManager.soundManagerScript.PlaySound("regularWin");
         }
 	}
 

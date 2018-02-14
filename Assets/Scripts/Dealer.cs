@@ -29,6 +29,7 @@ public class Dealer : MonoBehaviour {
     private float dealCardTimerCooldown = 0.75f;
     private int dealRowCardIndex = 0;
     private Card firstCardExploded;
+    private AudioSource deckAudio;
     
     void Awake() {
         if (dealerScript == null) {
@@ -40,6 +41,7 @@ public class Dealer : MonoBehaviour {
     }
 
 	void Start () {
+        deckAudio = cardSpawnPosition.GetComponent<AudioSource>();
         InputHandler.inputHandlerScript.HideAllButtons();
         gameEnded = false;
         currentDeck.ShuffleDeck();
@@ -104,6 +106,7 @@ public class Dealer : MonoBehaviour {
                     script.cardObj = rows[rowInPlay - 1][dealRowCardIndex];
                     script.cardObj.crdScript = script;
                     spawnedCards.Add(c.gameObject);
+                    SoundManager.soundManagerScript.PlaySound("cardDraw");
                     if (rowInPlay == 1) {
                         script.cardObj.isTurned = false;
                     } else {
@@ -286,7 +289,6 @@ public class Dealer : MonoBehaviour {
         SortChildren(rows[0][0].crdScript.transform, bottomCard.crdScript.transform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder);
         rows[0][0].crdScript.FlipCard();
 
-        //TODO: change to use compare rows again
         //check if the cards still explode
         if (rows[0][0].cardNumber == upperCard.cardNumber) {
             return false;
