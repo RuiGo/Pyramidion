@@ -100,20 +100,20 @@ public class Dealer : MonoBehaviour {
             if (rowInPlay >= 0 && rowInPlay <= maxRows) {
                 if (dealRowCardIndex >= 0 && dealRowCardIndex < rows[rowInPlay - 1].Count) {
                     // Create card object
-                    Transform c = Instantiate(cardPrefab, cardSpawnPosition.position, cardPrefab.rotation) as Transform;
-                    CardScript script = c.GetComponent<CardScript>();
+                    Transform cardInstance = Instantiate(cardPrefab, cardSpawnPosition.position, cardPrefab.rotation) as Transform;
+                    CardScript script = cardInstance.GetComponent<CardScript>();
                     script.intendedPosition = availablePositionsList[rowInPlay - 1][dealRowCardIndex];
                     script.cardObj = rows[rowInPlay - 1][dealRowCardIndex];
                     script.cardObj.crdScript = script;
-                    spawnedCards.Add(c.gameObject);
+                    spawnedCards.Add(cardInstance.gameObject);
                     SoundManager.soundManagerScript.PlaySound("cardDraw");
                     if (rowInPlay == 1) {
                         script.cardObj.isTurned = false;
                     } else {
                         script.cardObj.isTurned = true;
-                        c.GetComponent<Animator>().SetTrigger("faceUp");
-                    }
-                    SortChildren(c, rowInPlay - 1);
+                        cardInstance.GetComponent<Animator>().SetTrigger("faceUp");
+                    }                    
+                    SortChildren(cardInstance, rowInPlay - 1);
 
                     dealRowCardIndex++;
                     dealCardTimer = dealCardTimerCooldown;
@@ -286,7 +286,9 @@ public class Dealer : MonoBehaviour {
         rows[0][0].crdScript.intendedPosition = availablePositionsList[rowInPlay - 1][bottomCardIndex];
         rows[0][0].crdScript.finalPositionDirection = rows[0][0].crdScript.intendedPosition.position - rows[0][0].crdScript.transform.position;
         rows[0][0].crdScript.isInPosition = false;
-        SortChildren(rows[0][0].crdScript.transform, bottomCard.crdScript.transform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder);
+        int bottomCardSortOrder = bottomCard.crdScript.transform.GetChild(0).GetComponent<SpriteRenderer>().sortingOrder;
+        SortChildren(rows[0][0].crdScript.transform, bottomCardSortOrder);
+        SortChildren(bottomCard.crdScript.transform, bottomCardSortOrder - 1);
         rows[0][0].crdScript.FlipCard();
 
         //check if the cards still explode

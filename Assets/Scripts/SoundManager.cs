@@ -11,15 +11,17 @@ public class SoundManager : MonoBehaviour {
     [SerializeField]
     private AudioSource uiSoundSource;
     [SerializeField]
+    private AudioSource bgAmbienceSoundSource;
+    [SerializeField]
     private AudioSource bgMusicSoundSource;
     [SerializeField]
     private AudioClip[] coinSounds = new AudioClip[2];
     [SerializeField]
     private AudioClip[] cardSounds = new AudioClip[1];
     [SerializeField]
-    private AudioClip[] backgroundSounds = new AudioClip[1];
+    private AudioClip[] bgAmbienceSounds = new AudioClip[1];
     [SerializeField]
-    private AudioClip[] backgroundMusic = new AudioClip[1];
+    private AudioClip[] bgMusic = new AudioClip[1];
 
     void Awake() {
         if(soundManagerScript == null) {
