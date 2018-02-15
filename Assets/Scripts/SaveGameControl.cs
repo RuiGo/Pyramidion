@@ -5,17 +5,17 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-public class GameControl : MonoBehaviour {
-    public static GameControl gameControl;    
-    public int gold;
+public class SaveGameControl : MonoBehaviour {
+    public static SaveGameControl saveGameControl;    
+    public int gameGold = -1;
 
     private string saveFilePath;
 
     private void Awake () {
-        if(gameControl == null) {
-            DontDestroyOnLoad(gameControl);
-            gameControl = this;
-        } else if(gameControl != this) {
+        if(saveGameControl == null) {
+            DontDestroyOnLoad(saveGameControl);
+            saveGameControl = this;
+        } else if(saveGameControl != this) {
             Destroy(gameObject);
         }
 
@@ -23,17 +23,19 @@ public class GameControl : MonoBehaviour {
     }
 
     private void Update () {
+        /*
         if(Input.GetKeyDown(KeyCode.I)) {
             SaveData();
         }
         if (Input.GetKeyDown(KeyCode.L)) {
             LoadData();
         }
+        */
     }
 
 
     public void SaveData() {
-        print(saveFilePath);
+        //print(saveFilePath);
         BinaryFormatter binFormatter = new BinaryFormatter();
         FileStream file;
         if (!File.Exists(saveFilePath)) {
@@ -42,9 +44,10 @@ public class GameControl : MonoBehaviour {
             file = File.Open(saveFilePath, FileMode.Open);
         }        
         PlayerData data = new PlayerData();
-        data.currentGold = gold;
+        data.currentGold = gameGold;
         binFormatter.Serialize(file, data);
         file.Close();
+        print("Saved Gold -> " + gameGold);
     }
 
     public void LoadData() {
@@ -53,9 +56,12 @@ public class GameControl : MonoBehaviour {
             FileStream file = File.Open(saveFilePath, FileMode.Open);
             PlayerData loadedData = (PlayerData)binFormatter.Deserialize(file);
             file.Close();
-            print("Gold -> " + loadedData.currentGold);
+            gameGold = loadedData.currentGold;
+            print("Loaded Gold -> " + loadedData.currentGold);
         } else {
             print("No save file exists.");
+            print("Adding 1000 gold by default.");
+            gameGold = 1000;
         }
     }
 }

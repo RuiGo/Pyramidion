@@ -18,7 +18,7 @@ public class PlayerInformation : MonoBehaviour {
     [SerializeField]
     private Text winLabel;
     [SerializeField]
-    private int gold = 1000;
+    private int gold = -1;
     [SerializeField]
     private int bet = 15;
     [SerializeField]
@@ -32,10 +32,13 @@ public class PlayerInformation : MonoBehaviour {
             print("PlayerInformation script duplicate destroyed!");
             Destroy(gameObject);
         }
+
+        SaveGameControl.saveGameControl.LoadData();
+        gold = SaveGameControl.saveGameControl.gameGold;
     }
 	
 	void Start () {
-        winnings = 0;
+        winnings = 0;       
         UpdateLabels();			
 	}
 
@@ -45,12 +48,18 @@ public class PlayerInformation : MonoBehaviour {
         } else if(isSubtractingWinnings) {
             SubtractBetProgressively();
         }
+
+        if(Input.GetKeyDown(KeyCode.G)) {
+            gold += 1000;
+        }
     }
 	
 	public void PlaceBet () {
         if (!isAddingWinnings) {
             print("Bet Placed (" + bet + ")");
             tempGold = gold;
+            SaveGameControl.saveGameControl.gameGold = gold - bet;
+            SaveGameControl.saveGameControl.SaveData();
             isSubtractingWinnings = true;
             MakeGoldPopup(false, bet);
             SoundManager.soundManagerScript.PlaySound("coinBet");
@@ -76,6 +85,8 @@ public class PlayerInformation : MonoBehaviour {
     public void AddWinnings () {
         if (!isAddingWinnings) {
             print("You won (" + winnings + ")");
+            SaveGameControl.saveGameControl.gameGold = gold + winnings;
+            SaveGameControl.saveGameControl.SaveData();
             tempGold = gold;
             isAddingWinnings = true;
             MakeGoldPopup(true, winnings);
